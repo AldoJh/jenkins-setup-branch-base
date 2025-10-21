@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'dev', url: 'git@github.com:AldoJh/jenkins-setup-branch-base.git'
+                git branch: "${env.BRANCH_NAME}", url: 'git@github.com:AldoJh/jenkins-setup-branch-base.git'
             }
         }
 
@@ -26,7 +26,13 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'docker-compose up -d'
+                script {
+                    if (env.BRANCH_NAME == 'main') {
+                        sh 'docker-compose -f docker-compose.prod.yml up -d'
+                    } else {
+                        sh 'docker-compose -f docker-compose.dev.yml up -d'
+                    }
+                }
             }
         }
     }
